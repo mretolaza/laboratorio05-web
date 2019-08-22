@@ -1,98 +1,392 @@
-<!DOCTYPE html>
-<html lang="ES">
-
-<head>
-    <link rel="stylesheet" type="text/css" href="./css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Laboratorio#5</title>
-</head>
-<script>
-    function getChatsMessages() {
-        fetch('http://msdeus.site:7000', {
-            method: 'GET'
-        }).then(response => {
-            return response.json()
-        })
-            .then(function (response) {
-
-                var chat = document.getElementById("chat-area");
-
-                while (chat.firstChild) {
-                    chat.removeChild(chat.firstChild);
-                }
-
-                for (var i = 0; i < response.length; i++) {
-                    var div = document.createElement("div");
-                    div.style.width = "560px";
-                    div.style.height = "auto";
-                    div.style.background = "#DBB3F2";
-                    div.style.color = "#fff";
-                    div.style.padding = "15px";
-                    div.style.borderRadius = "8px";
-                    div.style.marginBottom = "10px";
-                    div.style.fontFamily = "Roboto";
-                    div.style.fontSize = "20px";
-
-                    var node = document.createTextNode(response[i].nick + " :  " + response[i].text);
-
-                    div.appendChild(node);
-
-                    chat.appendChild(div);
-                }
-            })
-    }
-
-    function sendChatMessage() {
-
-        var text = document.getElementById("text-box").value;
-        var nick = document.getElementById("username-box").value;
-
-        if (nick === "" || text === "") {
-            alert("No puede enviar un mensaje vacío, favor llenar los cambios");
-        } else {
-            if (text.length <= 140) {
-                var fd = new FormData();
-
-                fd.append("username", nick);
-                fd.append("chatmessage", text);
-
-
-                var request = new XMLHttpRequest();
-                request.open("POST", "http://msdeus.site:7000");
-                request.send(fd);
-
-                getChatsMessages();
-
-            } else {
-
-                alert("El texto ingresado tiene más de 140 carácteres")
-            }
-        }
-
-    }
-</script>
+<!--Laboratorio 5-->
+<!--María Mercedes Retolaza Reyna-->
+<html>
 
 <body>
-    <script type="text/javascript">
-        const enter = 13
-        document.onkeydown = function (element) {
-            element = element || window.event;
-            switch (element.which || element.keyCode) {
-                case enter:
-                    sendChatMessage();
+    <script>
+        const messages = document.createElement("ul");
+        const sendContainer = document.createElement("div")
+        const br = document.createElement("BR")
+        const textAreaMessage = document.createElement("textAreaMessage")
+        const headerChat = document.createElement("div")
+        const sendMessageButton = document.createElement("sendMessageButton")
+        const chatContainer = document.createElement("div");
+        const hostName = 'mmretolaza'
+        var maximaFila = 0;
+
+        headerChat.append("Chat Universidad del Valle")
+        sendMessageButton.append("Enviar Mensaje")
+
+        headerChat.style = `
+                display: flex;
+                position: fixed;
+                left: 0;
+                top: 0;
+                font-family: roboto;
+                color: #FFFFFF;
+                font-size: 18pt;
+                font-weight: bold;
+                justify-content: center;
+                width: 97%;
+                height: 50px;
+                background-color: pink;
+                z-index: 1;
+            `
+
+        document.body.append(headerChat)
+        chatContainer.append(messages);
+
+        chatContainer.style = `
+                width: 100%;
+                max-height: 900px;
+                word-wrap: break-word;
+                overflow-y: scroll;
+                `;
+
+        document.body.append(chatContainer)
+
+        document.body.style = `
+                background-color: #C9B1FF;
+            `
+
+        sendMessageButton.style = `
+                width: 20%;
+                height: 30px;
+                position: fixed;
+                right: 0px;
+                bottom: 0px;
+                font-family: roboto;
+                font-size: 14pt;
+                color: 9b1cd4;
+                overflow-x: hidden;
+                background-color: BCFFBC;
+            `
+        textAreaMessage.style = `
+            	width: 90%;
+            	height: 40px;
+            	position: fixed;
+            	left: 0;
+				bottom: 0;
+				font-family: roboto;
+				font-size: 20pt;
+				overflow-x: hidden;
+                overflow-y: hidden;
+                background-color: #F7F7F7;
+                resize: none;
+            `
+        textAreaMessage.maxLength = 140
+        sendContainer.append(textAreaMessage)
+        sendContainer.append(sendMessageButton)
+
+        sendContainer.style = `
+                display: flex;
+                overflow-x: hidden;
+            `
+        messages.style = `
+                overflow-x: hidden;
+            `
+
+        document.body.append(sendContainer)
+        function getMessages() {
+
+
+            fetch('http://msdeus.site:7000', {
+                method: 'GET'
+            }).then(response => {
+                return response.json()
+            }).then(response => {
+                response.forEach(element => {
+                    if (element.rowid > maximaFila) {
+
+                        if ((/\.(gif|jpg|jpeg|tiff|png)$/i).test(element.chatmessage)) {
+                            const li = document.createElement("li")
+                            const estiloContainer = document.createElement("div")
+                            if (hostName == element.username) {
+                                li.style = `
+                                text-align: left;
+                                font-weight: 400;
+                                color: #011627;
+                                font-family: roboto;
+                                background: #5FDD9D;
+                                clear: both;
+                                float: right;
+                                float: left;
+                                max-width: 40%;
+                                border-radius: 10px;
+                                margin: 0.2em 2em 0 auto; 
+                                padding: 10px;
+                                list-style:none;
+                            `
+                                estiloContainer.style = `
+                                width: 0px;
+                                height: 0px;
+                                position: relative;
+                                border-left: 10px solid #5FDD9D;
+                                border-right: 10px solid transparent;
+                                border-top: 10px solid #5FDD9D;
+                                border-bottom: 10px solid transparent;
+                                right: 18px;
+                                margin: 0 -2.5em 0 auto;
+                                bottom: 51px;
+                            `
+                            }
+                            else {
+                                li.style = `
+                                text-align: left;
+                                font-weight: 500;
+                                color: #011627;
+                                font-family: roboto;
+                                background: #58db98;
+                                clear: both;
+                                float: left;
+                                max-width: 40%;
+                                border-radius: 10px;
+                                margin: 0.2em 0 0 auto;
+                                padding: 10px;
+                                list-style:none;
+                            `
+                                estiloContainer.style = `
+                                width: 0px;
+                                height: 0px;
+                                position: relative;
+                                border-left: 10px solid transparent;
+                                border-right: 10px solid #58db98;
+                                border-top: 10px solid #58db98;
+                                border-bottom: 10px solid transparent;
+                                right: 22px;
+                                top: -51px;
+                            `
+                            }
+                            const li1 = document.createElement("li")
+                            li1.append(element.username + " ")
+                            li1.style = `
+                                font-family: "Roboto", Gadget, sans-serif;
+                                color: #3E5F8A;
+                            `
+                            const li2 = document.createElement("li")
+                            const imagen = document.createElement("img")
+                            imagen.src = element.chatmessage
+                            imagen.style = 'height: auto; max-width: 100%;'
+                            li2.append(imagen)
+                            li.append(li1)
+                            li.append(li2)
+                            li.append(estiloContainer)
+                            messages.append(li)
+                            chatContainer.scrollTop = chatContainer.scrollHeight
+                        }
+                        else if ((/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g).test(element.chatmessage)) {
+                            const li = document.createElement("li")
+                            const estiloContainer = document.createElement("div")
+                            if (hostName == element.username) {
+                                li.style = `
+                                text-align: left;
+                                font-weight: 400;
+                                color: #011627;
+                                font-family: roboto;
+                                background: #5FDD9D;
+                                clear: both;
+                                float: right;
+                                float: left;
+                                max-width: 40%;
+                                border-radius: 10px;
+                                margin: 0.2em 2em 0 auto; 
+                                padding: 10px;
+                                list-style:none;
+                            `
+                                estiloContainer.style = `
+                                width: 0px;
+                                height: 0px;
+                                position: relative;
+                                border-left: 10px solid #5FDD9D;
+                                border-right: 10px solid transparent;
+                                border-top: 10px solid #5FDD9D;
+                                border-bottom: 10px solid transparent;
+                                right: 18px;
+                                margin: 0 -2.5em 0 auto;
+                                bottom: 51px;
+                            `
+                            }
+                            else {
+                                li.style = `
+                                text-align: left;
+                                font-weight: 400;
+                                color: #011627;
+                                font-family: roboto;
+                                background: #5FDD9D;
+                                clear: both;
+                                float: left;
+                                max-width: 40%;
+                                border-radius: 10px;
+                                margin: 0.2em 0 0 auto;
+                                padding: 10px;
+                                list-style:none;
+                            `
+                                estiloContainer.style = `
+                                width: 0px;
+                                height: 0px;
+                                position: relative;
+                                border-left: 10px solid transparent;
+                                border-right: 10px solid #5FDD9D;
+                                border-top: 10px solid #5FDD9D;
+                                border-bottom: 10px solid transparent;
+                                right: 22px;
+                                top: -51px;
+                            `
+                            }
+                            const li1 = document.createElement("li")
+                            li1.append(element.username + " ")
+                            li1.style = `
+                                font-family: "Roboto", Gadget, sans-serif;
+                                color: #3E5F8A;
+                            `
+                            const li2 = document.createElement("li")
+                            li2.style = `
+            					display: flex;
+            					justify-content: center;
+                            `
+                            const frame = document.createElement("iframe")
+                            frame.src = element.chatmessage
+                            frame.style = 'height: auto; max-width: 100%;'
+                            li2.append(frame)
+                            const li3 = document.createElement("li")
+                            li3.style = `
+                                word-break: break-all;
+                            `
+                            li3.append(element.chatmessage)
+                            li.append(li1)
+                            li.append(li2)
+                            li.append(li3)
+                            li.append(estiloContainer)
+                            messages.append(li)
+                            chatContainer.scrollTop = chatContainer.scrollHeight
+                        }
+                        else {
+                            const li = document.createElement("li")
+                            const estiloContainer = document.createElement("div")
+                            if (hostName == element.username) {
+                                li.style = `
+                                text-align: left;
+                                font-weight: 400;
+                                color: #011627;
+                                font-family: roboto;
+                                background: #5FDD9D;
+                                clear: both;
+                                float: left;
+                                float: right;
+                                max-width: 40%;
+                                border-radius: 10px;
+                                margin: 0.2em 2em 0 auto; 
+                                padding: 10px;
+                                list-style:none;
+                            `
+                                estiloContainer.style = `
+                                width: 0px;
+                                height: 0px;
+                                position: relative;
+                                border-left: 10px solid #5FDD9D;
+                                border-right: 10px solid transparent;
+                                border-top: 10px solid #5FDD9D;
+                                border-bottom: 10px solid transparent;
+                                right: 18px;
+                                margin: 0 -2.5em 0 auto;
+                                bottom: 33px;
+                            `
+                            }
+                            else {
+                                li.style = `
+                                text-align: left;
+                                font-weight: 400;
+                                color: #011627;
+                                font-family: roboto;
+                                background: #5FDD9D;
+                                clear: both;
+                                float: left;
+                                max-width: 40%;
+                                border-radius: 10px;
+                                margin: 0.2em 0 0 auto;
+                                padding: 10px;
+                                list-style:none;
+                            `
+                                estiloContainer.style = `
+                                width: 0px;
+                                height: 0px;
+                                position: relative;
+                                border-left: 10px solid transparent;
+                                border-right: 10px solid #5FDD9D;
+                                border-top: 10px solid #5FDD9D;
+                                border-bottom: 10px solid transparent;
+                                right: 22px;
+                                top: -33px;
+                            `
+                            }
+                            const li1 = document.createElement("li")
+                            li1.append(element.username + " ")
+                            li1.style = `
+                                font-family: "Roboto", Gadget, sans-serif;
+                                color: #3E5F8A;
+                            `
+                            const li2 = document.createElement("li")
+                            li2.style = `
+                                word-break: break-word;
+                            `
+                            li2.append(element.chatmessage)
+                            li.append(li1)
+                            li.append(li2)
+                            li.append(estiloContainer)
+                            messages.append(li)
+                            chatContainer.scrollTop = chatContainer.scrollHeight
+                            window.scrollTo(0, document.body.scrollHeight)
+                        }
+                        maximaFila = element.rowid;
+                    }
+                });
+            })
+        }
+
+        getMessages()
+
+        textAreaMessage.onkeydown = function () {
+
+            if (event.keyCode === 13) {
+                const textMessage = textAreaMessage.textMessageue.trim()
+                fetch('http://msdeus.site:7000', {
+                    method: 'POST',
+                    body: `
+                                {
+                                    "username": "${hostName}",
+                                    "chatmessage": "${textMessage}"
+                                }
+                            `
+                }).then(() => {
+                    textAreaMessage.textMessageue = ''
+                    getMessages()
+
+
+                })
             }
         }
-        getChatsMessages();
+
+        sendMessageButton.onclick = function () {
+            const textMessage = textAreaMessage.textMessageue.trim()
+            fetch('http://msdeus.site:7000', {
+                method: 'POST',
+                body: `
+                            {
+                                "username": "${hostName}",
+                                "chatmessage": "${textMessage}"
+                            }
+                        `
+            }).then(() => {
+                textAreaMessage.textMessageue = ''
+                getMessages()
+
+
+            })
+        }
+
+        setIntertextMessage(getMessages, 5000)
+
     </script>
-    <div class="box-style-body">
-        <input class="box-style" type="text" name="username-box" id="username-box" placeholder="Nombre de usuario">
-        <input class="box-style" type="text" name="text-box" id="text-box" placeholder="Escribe tu mensaje...">
-        <button class="btn-chat" onclick={sendChatMessage()}>
-            <i class="fa fa-location-arrow"></i>
-        </button>
-    </div>
-    <div class="chat" id="chat-area">
-    </div>
 </body>
 
 </html>
