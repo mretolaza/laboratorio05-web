@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ES">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Laboratorio#5</title>
+</head>
+<script>
+    function getChatsMessages() {
+        fetch('http://msdeus.site:7000', {
+            method: 'GET'
+        }).then(response => {
+            return response.json()
+        })
+            .then(function (response) {
+
+                var chat = document.getElementById("chat-area");
+
+                while (chat.firstChild) {
+                    chat.removeChild(chat.firstChild);
+                }
+
+                for (var i = 0; i < response.length; i++) {
+                    var div = document.createElement("div");
+                    div.style.width = "560px";
+                    div.style.height = "auto";
+                    div.style.background = "#DBB3F2";
+                    div.style.color = "#fff";
+                    div.style.padding = "15px";
+                    div.style.borderRadius = "8px";
+                    div.style.marginBottom = "10px";
+                    div.style.fontFamily = "Roboto";
+                    div.style.fontSize = "20px";
+
+                    var node = document.createTextNode(response[i].nick + " :  " + response[i].text);
+
+                    div.appendChild(node);
+
+                    chat.appendChild(div);
+                }
+            })
+    }
+
+    function sendChatMessage() {
+
+        var text = document.getElementById("text-box").value;
+        var nick = document.getElementById("username-box").value;
+
+        if (nick === "" || text === "") {
+            alert("No puede enviar un mensaje vacío, favor llenar los cambios");
+        } else {
+            if (text.length <= 140) {
+                var fd = new FormData();
+
+                fd.append("username", nick);
+                fd.append("chatmessage", text);
+
+
+                var request = new XMLHttpRequest();
+                request.open("POST", "http://msdeus.site:7000");
+                request.send(fd);
+
+                getChatsMessages();
+
+            } else {
+
+                alert("El texto ingresado tiene más de 140 carácteres")
+            }
+        }
+
+    }
+</script>
+
+<body>
+    <script type="text/javascript">
+        const enter = 13
+        document.onkeydown = function (element) {
+            element = element || window.event;
+            switch (element.which || element.keyCode) {
+                case enter:
+                    sendChatMessage();
+            }
+        }
+        getChatsMessages();
+    </script>
+    <div class="box-style-body">
+        <input class="box-style" type="text" name="username-box" id="username-box" placeholder="Nombre de usuario">
+        <input class="box-style" type="text" name="text-box" id="text-box" placeholder="Escribe tu mensaje...">
+        <button class="btn-chat" onclick={sendChatMessage()}>
+            <i class="fa fa-location-arrow"></i>
+        </button>
+    </div>
+    <div class="chat" id="chat-area">
+    </div>
+</body>
+
+</html>
